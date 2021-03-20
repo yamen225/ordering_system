@@ -19,8 +19,9 @@ class ProductTest(TestCase):
         """will not save if product seller is not admin
         """
         prod_count = Product.objects.count()
-        p = Product.objects.create(
+        p = Product(
             seller=self.normal_user, price=1, quantity=1, name="prod 1")
+        self.assertFalse(p.save())
         self.assertEqual(prod_count, Product.objects.count())
 
     def test_seller_can_only_be_admin(self):
