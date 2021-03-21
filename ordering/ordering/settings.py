@@ -41,10 +41,12 @@ INSTALLED_APPS = [
     # Third party apps
     'django_nose',
     'rest_framework',
+    'django_extensions',
     # local apps
     'accounts',
     'orders',
     'products',
+    'currencies',
 ]
 
 MIDDLEWARE = [
@@ -139,5 +141,5 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 # Tell nose to measure coverage on the 'foo' and 'bar' apps
 NOSE_ARGS = [
     '--with-coverage',
-    '--cover-package=accounts,products,orders',
+    '--cover-package=accounts,products,orders,currencies',
 ]

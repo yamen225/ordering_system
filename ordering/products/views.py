@@ -30,7 +30,8 @@ class ProductViewSet(viewsets.ModelViewSet):
         if self.request.user.is_staff:
             return super().list(request, *args, **kwargs)
         else:
-            queryset = self.filter_queryset(Product.get_available_products())
+            queryset = self.filter_queryset(
+                Product.get_available_products(user=self.request.user))
 
             page = self.paginate_queryset(queryset)
             if page is not None:

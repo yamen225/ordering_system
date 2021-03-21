@@ -5,6 +5,7 @@ from model_mommy import mommy
 from products.models import Product
 
 from ..models import Order
+from currencies.models import Currency
 
 
 class OrderTest(TestCase):
@@ -16,8 +17,9 @@ class OrderTest(TestCase):
             username='admin', password='1234', is_staff=True)
         self.normal_user: User = User.objects.create(
             username='non_admin', password='1234', is_staff=False)
+        self.currency: Currency = Currency.objects.first()
         self.product: Product = Product.objects.create(
-            seller=self.admin_user, price=10, name="test product")
+            seller=self.admin_user, price=10, name="test product", currency=self.currency)
         super().setUp()
 
     def test_buyer_can_not_be_admin(self):
@@ -32,8 +34,8 @@ class OrderTest(TestCase):
     def test_product_cant_be_deleted(self):
         """will not save order if product is soft deleted
         """
-        prod1: Product = Product(seller=self.admin_user, price=10, is_deleted=True, name="wp")
-        prod1.save()
+        prod1: Product = Product.objects.create(
+            seller=self.admin_user, price=10, is_deleted=True, name="wp", currency=self.currency)
         ord_count: int = Order.objects.count()
         o = Order(product=prod1,
                   buyer=self.normal_user, amount=self.product.price)
@@ -44,9 +46,8 @@ class OrderTest(TestCase):
         """will save order 
         """
         ord_count: int = Order.objects.count()
-        o = Order(product=self.product, buyer=self.normal_user,
+        o = Order.objects.create(product=self.product, buyer=self.normal_user,
                   amount=self.product.price)
-        o.save()
         self.assertEqual(ord_count + 1, Order.objects.count())
 
     def test_can_get_sum_of_all_purchased_orders(self):

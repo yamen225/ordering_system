@@ -1,6 +1,6 @@
 from django.core.validators import MinValueValidator
 from django.db import models
-
+from currencies.models import Currency
 # Create your models here.
 
 
@@ -14,9 +14,9 @@ class Product (models.Model):
         help_text='price of product in chosen currency - must be gt 0')
     name = models.CharField(max_length=255, help_text='product name')
     is_deleted = models.BooleanField(default=False)
-    # currency = models.ForeignKey(
-    #     'currency.Currency', on_delete=models.CASCADE, related_name='products',
-    #     help_text='currency of the product')
+    currency = models.ForeignKey(
+        'currencies.Currency', on_delete=models.CASCADE, related_name='products',
+        help_text='currency of the product')
 
     def save(self, *args, **kwargs):
         """override save function to ensure validations
@@ -26,7 +26,16 @@ class Product (models.Model):
         super().save(*args, **kwargs)
 
     @staticmethod
-    def get_available_products():
+    def get_available_products(user):
+
+        qs = Product.objects.filter(is_deleted=False)
+        user_currency = user.currency
+        if user_currency:
+            Currency.update()
+            user_currency_current_value = Currency.objects.get(id=user_currency.id)
+            qs = qs.annotate(
+                user_currency_price=(models.F('price') / models.F('currency__value')
+                                     ) * user_currency_current_value)
         return Product.objects.filter(is_deleted=False)
 
     @staticmethod

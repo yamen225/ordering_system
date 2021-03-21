@@ -1,9 +1,10 @@
+import mock
 from django.test import TestCase
 
 from accounts.models import User
 from model_mommy import mommy
 from orders.models import Order
-
+from currencies.models import Currency
 from ..models import Product
 
 
@@ -16,8 +17,10 @@ class ProductTest(TestCase):
             username='admin', password='1234', is_staff=True)
         self.normal_user: User = User.objects.create(
             username='non_admin', password='1234', is_staff=False)
+        self.currency = Currency.objects.first()
+        self.normal_user_curr = Currency.objects.create(code='EGP', value=18.665)
         self.product: Product = Product.objects.create(
-            seller=self.admin_user, price=10, name="test product")
+            seller=self.admin_user, price=10, name="test product", currency=self.currency)
         super().setUp()
 
     def test_seller_can_not_be_non_admin(self):
@@ -25,7 +28,7 @@ class ProductTest(TestCase):
         """
         prod_count = Product.objects.count()
         p = Product(
-            seller=self.normal_user, price=1, name="prod 1")
+            seller=self.normal_user, price=1, name="prod 1", currency=self.currency)
         self.assertFalse(p.save())
         self.assertEqual(prod_count, Product.objects.count())
 
@@ -34,7 +37,7 @@ class ProductTest(TestCase):
         """
         prod_count = Product.objects.count()
         p = Product.objects.create(
-            seller=self.admin_user, price=1, name="prod 1")
+            seller=self.admin_user, price=1, name="prod 1",currency=self.currency)
         self.assertNotEqual(prod_count, Product.objects.count())
 
     def test_price_must_be_gt_0(self):
@@ -42,9 +45,8 @@ class ProductTest(TestCase):
         """
         prod_count = Product.objects.count()
         p = Product.objects.create(
-            seller=self.normal_user, price=0, name="prod 1")
+            seller=self.normal_user, price=0, name="prod 1", currency=self.currency)
         self.assertEqual(prod_count, Product.objects.count())
-
 
     def test_can_get_products_purchased_by_user(self):
         Order.objects.all().delete()
@@ -56,7 +58,7 @@ class ProductTest(TestCase):
 
         other_user: User = User.objects.create(
             username='other', password='1234', is_staff=False)
-        prod1 = Product(seller=self.admin_user, price=10, name="wp")
+        prod1 = Product(seller=self.admin_user, price=10, name="wp", currency=self.currency)
         prod1.save()
 
         other_orders = mommy.make(

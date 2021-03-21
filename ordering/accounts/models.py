@@ -3,8 +3,7 @@ from django.db import models
 
 
 class User(AbstractUser):
-    pass
-    # currency = models.ForeignKey(
-    #     'currency.Currency', on_delete=models.CASCADE, related_name='products',
-    #     help_text='currency of the product')
-    # add additional fields in here
+
+    currency = models.ForeignKey(
+        'currencies.Currency', on_delete=models.CASCADE, related_name='users',
+        help_text='currency of the user', null=True)

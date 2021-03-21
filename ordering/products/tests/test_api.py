@@ -4,6 +4,7 @@ from orders.models import Order
 from rest_framework.test import APITestCase
 
 from ..models import Product
+from currencies.models import Currency
 
 
 class ProductApiTests(APITestCase):
@@ -15,10 +16,12 @@ class ProductApiTests(APITestCase):
             username='admin', password='1234', is_staff=True)
         self.normal_user: User = User.objects.create(
             username='normal', password='1234', is_staff=False)
-        self.products = mommy.make(Product, seller=self.admin_user, _quantity=5)
+        self.currency = Currency.objects.first()
+        self.products = mommy.make(
+            Product, seller=self.admin_user, currency=self.currency, _quantity=5)
         [i.save() for i in self.products]
         self.product: Product = Product.objects.create(
-            seller=self.admin_user, price=10, name="test product")
+            seller=self.admin_user, price=10, name="test product", currency=self.currency)
 
     def test_admin_can_get_all_products(self):
         self.client.force_authenticate(user=self.admin_user)
@@ -30,7 +33,9 @@ class ProductApiTests(APITestCase):
         self.assertTrue(any([i['is_deleted'] is False for i in res.data['results']]))
 
     def test_non_admin_cannot_get_all_products_only_available(self):
-        prod1: Product = Product(seller=self.admin_user,price=10, is_deleted=True, name="wp")
+        prod1: Product = Product(
+            seller=self.admin_user,price=10, is_deleted=True, name="wp",
+            currency=self.currency)
         prod1.save()
         self.client.force_authenticate(user=self.normal_user)
 
@@ -41,13 +46,14 @@ class ProductApiTests(APITestCase):
                          Product.objects.filter(is_deleted=False).count())
         self.assertFalse(any([i['name'] == 'wp' for i in res.data['results']]))
         self.assertTrue(all(
-            [i['name'] in Product.get_available_products().values_list('name', flat=True)
+            [i['name'] in Product.get_available_products(
+                user=self.normal_user).values_list('name', flat=True)
              for i in res.data['results']]))
 
     def test_admin_can_create_product(self):
         prod_count = Product.objects.count()
         self.client.force_authenticate(user=self.admin_user)
-        data = {'price': 20, 'name': 'test product'}
+        data = {'price': 20, 'name': 'test product', 'currency': self.currency.id}
 
         res = self.client.post('/api/v1/products/', data, format='json')
 
@@ -57,10 +63,10 @@ class ProductApiTests(APITestCase):
 
     def test_admin_can_edit_product(self):
         self.client.force_authenticate(user=self.admin_user)
-        data = {'price': 20, 'name': 'test product'}
+        data = {'price': 20, 'name': 'test product', 'currency': self.currency.id}
         res = self.client.post('/api/v1/products/', data, format='json')
         prod_count = Product.objects.count()
-        data = {'price': 20, 'name': 'test product1'}
+        data = {'price': 20, 'name': 'test product1', 'currency': self.currency.id}
 
         res = self.client.put(
             '/api/v1/products/{}/'.format(res.data['id']), data, format='json')
@@ -72,7 +78,7 @@ class ProductApiTests(APITestCase):
     def test_admin_can_delete_product(self):
         """Ensure admin can soft_delete an item"""
         self.client.force_authenticate(user=self.admin_user)
-        data = {'price': 20, 'name': 'test product1'}
+        data = {'price': 20, 'name': 'test product1', 'currency': self.currency.id}
         res = self.client.post('/api/v1/products/', data, format='json')
 
         res = self.client.delete(
@@ -84,7 +90,7 @@ class ProductApiTests(APITestCase):
     def test_endpoint_returns_400_on_wrong_data(self):
         prod_count = Product.objects.count()
         self.client.force_authenticate(user=self.admin_user)
-        data = {'price': -20, 'name': 'test product'}
+        data = {'price': -20, 'name': 'test product', 'currency': self.currency.id}
 
         res = self.client.post('/api/v1/products/', data, format='json')
 

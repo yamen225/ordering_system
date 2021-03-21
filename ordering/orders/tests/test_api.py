@@ -4,6 +4,7 @@ from products.models import Product
 from rest_framework.test import APITestCase
 
 from ..models import Order
+from currencies.models import Currency
 
 
 class OrderApiTest(APITestCase):
@@ -14,13 +15,15 @@ class OrderApiTest(APITestCase):
             username='normal', password='1234', is_staff=False)
         self.admin_user: User = User.objects.create(
             username='admin', password='1234', is_staff=True)
+        self.currency = Currency.objects.first()
         self.product: Product = Product.objects.create(
-            seller=self.admin_user, price=10, name="test product")
+            seller=self.admin_user, price=10, name="test product", currency=self.currency)
+
 
     def test_nomral_user_can_create_order(self):
         ord_count = Order.objects.count()
         self.client.force_authenticate(user=self.normal_user)
-        order_data = {'amount': 20, 'product': self.product.id}
+        order_data = {'amount': 20, 'product': self.product.id, 'currency': self.currency.id}
 
         ord_res = self.client.post('/api/v1/orders/', order_data, format='json')
 
@@ -31,7 +34,7 @@ class OrderApiTest(APITestCase):
 
     def test_admin_cannot_create_order(self):
         self.client.force_authenticate(user=self.admin_user)
-        order_data = {'amount': 20, 'product': self.product.id}
+        order_data = {'amount': 20, 'product': self.product.id, 'currency': self.currency.id}
 
         ord_res = self.client.post('/api/v1/orders/', order_data, format='json')
 
@@ -54,6 +57,5 @@ class OrderApiTest(APITestCase):
         self.client.force_authenticate(user=self.admin_user)
 
         ord_res = self.client.get('/api/v1/orders/total_revenue/', format='json')
-        print(ord_res.data)
         self.assertEqual(ord_res.status_code, 200)
         self.assertTrue(ord_res.data['total_revenue'], self.product.price * 3)
