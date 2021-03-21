@@ -1,6 +1,7 @@
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
 
 from .models import Product
 from .serializers import (
@@ -15,6 +16,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     """
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    throttle_classes = [UserRateThrottle]
 
     def get_permissions(self):
         """

@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
 
 from .models import Order
 from .serializers import (
@@ -16,6 +17,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     """
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+    throttle_classes = [UserRateThrottle]
     permission_classes_by_action = {
         'create': [permissions.IsAuthenticated], 'list': [permissions.IsAuthenticated],
         'retrieve': [permissions.IsAdminUser], 'update': [permissions.IsAdminUser],
