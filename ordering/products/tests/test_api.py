@@ -1,7 +1,8 @@
-from rest_framework.test import APITestCase
-from model_mommy import mommy
 from accounts.models import User
+from model_mommy import mommy
 from orders.models import Order
+from rest_framework.test import APITestCase
+
 from ..models import Product
 
 

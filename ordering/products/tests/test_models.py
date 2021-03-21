@@ -1,8 +1,9 @@
-from model_mommy import mommy
 from django.test import TestCase
 
 from accounts.models import User
+from model_mommy import mommy
 from orders.models import Order
+
 from ..models import Product
 
 

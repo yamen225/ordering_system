@@ -1,7 +1,8 @@
-from django.db import models
 from django.core.validators import MinValueValidator
+from django.db import models
 
 from products.models import Product
+
 # Create your models here.
 
 
