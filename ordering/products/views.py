@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
-from rest_framework import viewsets
-from rest_framework import permissions
-
+from rest_framework import status, viewsets, permissions
+from rest_framework.response import Response
 from .models import Product
 from .serializers import ProductSerializer
 
@@ -15,3 +14,9 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer=ProductSerializer):
         serializer.save(seller=self.request.user)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.is_deleted = True
+        instance.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)

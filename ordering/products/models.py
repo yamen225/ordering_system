@@ -10,17 +10,20 @@ class Product (models.Model):
         help_text='creator of product from user model - must be admin')
     price = models.FloatField(
         validators=[MinValueValidator(1)],
-        help_text='price of product in EUR - must be gt 0')
-    quantity = models.IntegerField(
-        default=0,
-        validators=[MinValueValidator(0)],
-        help_text='number of items available from this product to be sold - must be gte 0'
-    )
+        help_text='price of product in chosen currency - must be gt 0')
     name = models.CharField(max_length=255, help_text='product name')
+    is_deleted = models.BooleanField(default=False)
+    # currency = models.ForeignKey(
+    #     'currency.Currency', on_delete=models.CASCADE, related_name='products',
+    #     help_text='currency of the product')
 
     def save(self, *args, **kwargs):
-        """override save function to ensure seller.is_admin is True
+        """override save function to ensure validations
         """
-        if not self.seller.is_staff or self.quantity < 0 or self.price <= 0:
+        if not self.seller.is_staff or self.price <= 0:
             return False
         super().save(*args, **kwargs)
+
+    @staticmethod
+    def get_available_products(cls):
+        return Product.objects.filter(is_deleted=False)
