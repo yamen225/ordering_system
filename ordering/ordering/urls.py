@@ -23,5 +23,6 @@ urlpatterns = [
     path('admin/doc/', include('django.contrib.admindocs.urls')),
     path('admin/', admin.site.urls),
     path('api/v1/', include((product_router.urls, 'products'))),
-    path('api/v1/', include((order_router.urls, 'orders')))
-]
+    path('api/v1/', include((order_router.urls, 'orders'))),
+    path('rest-auth/', include('dj_rest_auth.urls')),
+    path('rest-auth/registration/', include('dj_rest_auth.registration.urls'))]

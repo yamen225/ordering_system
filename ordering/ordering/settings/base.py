@@ -35,7 +35,14 @@ INSTALLED_APPS = [
     # Third party apps
     'django_nose',
     'rest_framework',
+    'rest_framework.authtoken',
     'django_extensions',
+    'dj_rest_auth',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'dj_rest_auth.registration',
     # local apps
     'accounts',
     'orders',
@@ -51,6 +58,13 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+AUTHENTICATION_BACKENDS = [
+    # allauth specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+    # Needed to login by username in Django admin, regardless of allauth
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 ROOT_URLCONF = 'ordering.urls'
@@ -138,3 +152,5 @@ STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'accounts.User'
 
 FIXER_KEY = env("FIXER_KEY")
+
+SITE_ID = 1
