@@ -11,6 +11,8 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class NormalProductSerializer(ProductSerializer):
 
+    price = serializers.FloatField(read_only=True, source='user_currency_price')
+
     class Meta:
         model = Product
         fields = ['id', 'name', 'price']

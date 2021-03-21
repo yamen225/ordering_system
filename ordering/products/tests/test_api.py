@@ -1,3 +1,4 @@
+import mock
 from accounts.models import User
 from model_mommy import mommy
 from orders.models import Order
@@ -12,11 +13,11 @@ class ProductApiTests(APITestCase):
     """
 
     def setUp(self):
-        self.admin_user: User = User.objects.create(
-            username='admin', password='1234', is_staff=True)
-        self.normal_user: User = User.objects.create(
-            username='normal', password='1234', is_staff=False)
         self.currency = Currency.objects.first()
+        self.admin_user: User = User.objects.create(
+            username='admin', password='1234', is_staff=True, currency=self.currency)
+        self.normal_user: User = User.objects.create(
+            username='normal', password='1234', is_staff=False, currency=self.currency)
         self.products = mommy.make(
             Product, seller=self.admin_user, currency=self.currency, _quantity=5)
         [i.save() for i in self.products]
@@ -32,9 +33,11 @@ class ProductApiTests(APITestCase):
         self.assertEqual(res.data['count'], Product.objects.count())
         self.assertTrue(any([i['is_deleted'] is False for i in res.data['results']]))
 
-    def test_non_admin_cannot_get_all_products_only_available(self):
+    @mock.patch('currencies.models.Currency.updating_latest_values')
+    def test_non_admin_cannot_get_all_products_only_available(self, update_currencies_mock):
+        update_currencies_mock.return_value = True
         prod1: Product = Product(
-            seller=self.admin_user,price=10, is_deleted=True, name="wp",
+            seller=self.admin_user, price=10, is_deleted=True, name="wp",
             currency=self.currency)
         prod1.save()
         self.client.force_authenticate(user=self.normal_user)
@@ -49,6 +52,20 @@ class ProductApiTests(APITestCase):
             [i['name'] in Product.get_available_products(
                 user=self.normal_user).values_list('name', flat=True)
              for i in res.data['results']]))
+        self.assertTrue(update_currencies_mock.called)
+
+    @mock.patch('currencies.models.Currency.updating_latest_values')
+    def test_normal_user_see_available_product_with_his_currency(self, update_currencies_mock):
+        update_currencies_mock.return_value = True
+        self.normal_user.currency = Currency.objects.create(code='EGP', value='16.665')
+        self.normal_user.save()
+        self.client.force_authenticate(user=self.normal_user)
+
+        res = self.client.get('/api/v1/products/')
+
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(all([i['price'] == Product.objects.get(id=i['id']).price * 16.665
+                             for i in res.data['results']]))
 
     def test_admin_can_create_product(self):
         prod_count = Product.objects.count()

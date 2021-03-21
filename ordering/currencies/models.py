@@ -10,8 +10,9 @@ class Currency(models.Model):
     last_updated = models.DateField(auto_now=True)
 
     @staticmethod
-    def update(cls):
+    def updating_latest_values(cls):
         """Update the currencies daily"""
+        print("called v2")
         from .tasks import update_currencies
         today = date.today()
         if not cls.objects.first().last_update == today:

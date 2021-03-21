@@ -27,16 +27,18 @@ class Product (models.Model):
 
     @staticmethod
     def get_available_products(user):
-
+        print("called")
         qs = Product.objects.filter(is_deleted=False)
         user_currency = user.currency
+        print(user_currency)
         if user_currency:
-            Currency.update()
-            user_currency_current_value = Currency.objects.get(id=user_currency.id)
+            Currency.updating_latest_values()
+            user_currency_current_value = Currency.objects.get(id=user_currency.id).value
+            print(user_currency_current_value)
             qs = qs.annotate(
                 user_currency_price=(models.F('price') / models.F('currency__value')
                                      ) * user_currency_current_value)
-        return Product.objects.filter(is_deleted=False)
+        return qs
 
     @staticmethod
     def get_all_purchased(user):
