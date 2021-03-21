@@ -8,4 +8,51 @@ from ..models import Order
 class OrderApiTest(APITestCase):
     """Test Order API viewset
     """
-    pass
+    def setUp(self):
+        self.normal_user: User = User.objects.create(
+            username='normal', password='1234', is_staff=False)
+        self.admin_user: User = User.objects.create(
+            username='admin', password='1234', is_staff=True)
+        self.product: Product = Product.objects.create(
+            seller=self.admin_user, price=10, name="test product")
+
+    def test_nomral_user_can_create_order(self):
+        ord_count = Order.objects.count()
+        self.client.force_authenticate(user=self.normal_user)
+        order_data = {'amount': 20, 'product': self.product.id}
+
+        ord_res = self.client.post('/api/v1/orders/', order_data, format='json')
+
+        self.assertEqual(ord_res.status_code, 201)
+        self.assertTrue(Order.objects.filter(amount=20).exists())
+        self.assertNotEqual(ord_count, Order.objects.count())
+        self.assertEqual(ord_res.data['product'], self.product.id)
+
+    def test_admin_cannot_create_order(self):
+        self.client.force_authenticate(user=self.admin_user)
+        order_data = {'amount': 20, 'product': self.product.id}
+
+        ord_res = self.client.post('/api/v1/orders/', order_data, format='json')
+
+        self.assertEqual(ord_res.status_code, 405)
+
+    def test_non_admin_cannot_get_revenue(self):
+        self.client.force_authenticate(user=self.normal_user)
+
+        ord_res = self.client.get('/api/v1/orders/total_revenue/', format='json')
+
+        self.assertEqual(ord_res.status_code, 403)
+
+    def test_admin_can_get_sum_of_orders_amount(self):
+        Order.objects.all().delete()
+
+        orders = mommy.make(
+            Order, buyer=self.normal_user, product=self.product,
+            amount=self.product.price, _quantity=3)
+        [i.save() for i in orders]
+        self.client.force_authenticate(user=self.admin_user)
+
+        ord_res = self.client.get('/api/v1/orders/total_revenue/', format='json')
+        print(ord_res.data)
+        self.assertEqual(ord_res.status_code, 200)
+        self.assertTrue(ord_res.data['total_revenue'], self.product.price * 3)

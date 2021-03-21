@@ -16,10 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from products.urls import product_router
+from orders.urls import order_router
 
 
 urlpatterns = [
     path('admin/doc/', include('django.contrib.admindocs.urls')),
     path('admin/', admin.site.urls),
-    path('api/v1/', include((product_router.urls, 'products')))
+    path('api/v1/', include((product_router.urls, 'products'))),
+    path('api/v1/', include((order_router.urls, 'orders')))
 ]

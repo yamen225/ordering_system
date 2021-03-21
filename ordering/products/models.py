@@ -25,5 +25,9 @@ class Product (models.Model):
         super().save(*args, **kwargs)
 
     @staticmethod
-    def get_available_products(cls):
+    def get_available_products():
         return Product.objects.filter(is_deleted=False)
+
+    @staticmethod
+    def get_all_purchased(user):
+        return Product.objects.filter(orders__buyer=user)

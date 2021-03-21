@@ -58,27 +58,3 @@ class OrderTest(TestCase):
 
         self.assertEqual(Order.get_sum_purchased(), self.product.price * 3)
 
-    def test_can_get_products_purchased_by_user(self):
-        Order.objects.all().delete()
-
-        orders = mommy.make(
-            Order, buyer=self.normal_user, product=self.product,
-            amount=self.product.price, _quantity=3)
-        [i.save() for i in orders]
-
-        other_user: User = User.objects.create(
-            username='other', password='1234', is_staff=False)
-        prod1 = Product(seller=self.admin_user, price=10, name="wp")
-        prod1.save()
-
-        other_orders = mommy.make(
-            Order, buyer=other_user, product=prod1,
-            amount=self.product.price, _quantity=3)
-        [i.save() for i in other_orders]
-
-        self.assertTrue(Order.get_all_purchased(
-            user=self.normal_user),
-            Product.objects.filter(id=self.product.id))
-        self.assertTrue(Order.get_all_purchased(
-            user=other_user),
-            Product.objects.filter(id=prod1.id))

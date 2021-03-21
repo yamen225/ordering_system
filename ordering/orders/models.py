@@ -30,7 +30,3 @@ class Order(models.Model):
     def get_sum_purchased() -> float:
         return Order.objects.all().aggregate(
             models.Sum('amount'))['amount__sum'] or 0.00
-
-    @staticmethod
-    def get_all_purchased(user):
-        return Product.objects.filter(orders__buyer=user)
