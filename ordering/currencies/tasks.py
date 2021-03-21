@@ -1,9 +1,10 @@
 import requests
+from django.conf import settings
 from .models import Currency
 
 
 def update_currencies():
-    response = requests.get('http://data.fixer.io/api/latest?access_key=76a7def5eac09cedec5ad8d5052aa608')
+    response = requests.get(f'http://data.fixer.io/api/latest?access_key={settings.FIXER_KEY}')
     try:
         for key, val in response.json()['rates']:
             Currency.objects.update_or_create(code=key, value=val)
