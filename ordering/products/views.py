@@ -29,6 +29,8 @@ class ProductViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def list(self, request, *args, **kwargs):
+        """If user is staff will list all products, else will list only available product with
+        requester's currency."""
         if self.request.user.is_staff:
             return super().list(request, *args, **kwargs)
         else:
@@ -44,9 +46,11 @@ class ProductViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
 
     def perform_create(self, serializer=ProductSerializer):
+        """set requester to be the seller and creator of product."""
         serializer.save(seller=self.request.user)
 
     def destroy(self, request, *args, **kwargs):
+        """perform soft delete."""
         instance = self.get_object()
         instance.is_deleted = True
         instance.save()
@@ -55,6 +59,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'],
             permission_classes=[permissions.IsAuthenticated])
     def purchased(self, request):
+        """available for non staff only, shows purchased products."""
         if request.user.is_staff:
             return Response(status=status.HTTP_403_FORBIDDEN)
         queryset = self.filter_queryset(Product.get_all_purchased(user=request.user))

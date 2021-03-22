@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'dj_rest_auth.registration',
+    'drf_yasg',
+    'docs',
     # local apps
     'accounts',
     'orders',
@@ -155,3 +157,6 @@ AUTH_USER_MODEL = 'accounts.User'
 FIXER_KEY = env("FIXER_KEY")
 
 SITE_ID = 1
+
+DOCS_ROOT = BASE_DIR / 'docs/_build/html'
+DOCS_ACCESS = 'public'

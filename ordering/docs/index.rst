@@ -11,6 +11,7 @@ Welcome to ordering's documentation!
    :caption: Contents:
 
    modules/product_views
+   modules/product_models
 
 
 Indices and tables

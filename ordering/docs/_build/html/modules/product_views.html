@@ -14,6 +14,7 @@
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Product Models" href="product_models.html" />
     <link rel="prev" title="Welcome to ordering’s documentation!" href="../index.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -39,9 +40,34 @@
 <dd><p>API endpoint that allows all products to be viewed or edited by admins.
 Allow view available products for normal users</p>
 <dl class="py method">
+<dt id="products.views.ProductViewSet.destroy">
+<code class="sig-name descname"><span class="pre">destroy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/products/views.html#ProductViewSet.destroy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#products.views.ProductViewSet.destroy" title="Permalink to this definition">¶</a></dt>
+<dd><p>perform soft delete.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="products.views.ProductViewSet.get_permissions">
 <code class="sig-name descname"><span class="pre">get_permissions</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/products/views.html#ProductViewSet.get_permissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#products.views.ProductViewSet.get_permissions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Instantiates and returns the list of permissions that this view requires.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="products.views.ProductViewSet.list">
+<code class="sig-name descname"><span class="pre">list</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/products/views.html#ProductViewSet.list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#products.views.ProductViewSet.list" title="Permalink to this definition">¶</a></dt>
+<dd><p>If user is staff will list all products, else will list only available product with
+requester’s currency.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="products.views.ProductViewSet.perform_create">
+<code class="sig-name descname"><span class="pre">perform_create</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">serializer=&lt;class</span> <span class="pre">'products.serializers.ProductSerializer'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/products/views.html#ProductViewSet.perform_create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#products.views.ProductViewSet.perform_create" title="Permalink to this definition">¶</a></dt>
+<dd><p>set requester to be the seller and creator of product.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="products.views.ProductViewSet.purchased">
+<code class="sig-name descname"><span class="pre">purchased</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/products/views.html#ProductViewSet.purchased"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#products.views.ProductViewSet.purchased" title="Permalink to this definition">¶</a></dt>
+<dd><p>available for non staff only, shows purchased products.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -74,6 +100,7 @@ Allow view available products for normal users</p>
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Product Views</a></li>
+<li class="toctree-l1"><a class="reference internal" href="product_models.html">Product Models</a></li>
 </ul>
 
 <div class="relations">
@@ -81,6 +108,7 @@ Allow view available products for normal users</p>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
       <li>Previous: <a href="../index.html" title="previous chapter">Welcome to ordering’s documentation!</a></li>
+      <li>Next: <a href="product_models.html" title="next chapter">Product Models</a></li>
   </ul></li>
 </ul>
 </div>
