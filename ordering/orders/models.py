@@ -1,10 +1,6 @@
 from django.core.validators import MinValueValidator
 from django.db import models
 
-from products.models import Product
-
-# Create your models here.
-
 
 class Order(models.Model):
     """Store Order"""
@@ -29,5 +25,6 @@ class Order(models.Model):
 
     @staticmethod
     def get_sum_purchased() -> float:
+        """return the sum of all purchased products"""
         return Order.objects.all().aggregate(
-            models.Sum('amount'))['amount__sum'] or 0.00
+            models.Sum('product__price'))['product__sum'] or 0.00

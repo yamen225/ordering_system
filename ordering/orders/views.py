@@ -13,7 +13,7 @@ from .serializers import (
 
 
 class OrderViewSet(viewsets.ModelViewSet):
-    """API endpoint that allows products to be viewed or edited by admins.
+    """API endpoint that allows normal users to make an order and admins to get total revenue.
     """
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
@@ -24,9 +24,11 @@ class OrderViewSet(viewsets.ModelViewSet):
         'destroy': [permissions.IsAdminUser]}
 
     def perform_create(self, serializer=OrderSerializer):
+        """set the requester as the buyer."""
         serializer.save(buyer=self.request.user)
 
     def create(self, request, *args, **kwargs):
+        """Only normal user can create an order."""
         if request.user.is_staff:
             return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
         else:
@@ -47,6 +49,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'],
             permission_classes=[permissions.IsAdminUser])
     def total_revenue(self, request):
+        """admins only can get the sum of all purchased items."""
         data = {'total_revenue': Order.get_sum_purchased()}
         serializer = TotalRevenueSerializer(data)
         return Response(serializer.data)

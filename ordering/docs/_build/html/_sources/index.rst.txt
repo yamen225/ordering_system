@@ -12,6 +12,10 @@ Welcome to ordering's documentation!
 
    modules/product_views
    modules/product_models
+   modules/order_views
+   modules/order_models
+   modules/currency_task
+   modules/currency_models
 
 
 Indices and tables
